@@ -1,0 +1,42 @@
+services:
+  prometheus:
+    hostname: prometheus
+    image: prom/prometheus:v2.30.3
+    ports:
+      - 9000:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+  mysql:
+    image: mysql
+    hostname: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    security_opt:
+    - seccomp:unconfined
+  tenable-exporter:
+    hostname: tenable-exporter
+    build:
+      context: ./
+    environment:
+      - TENABLE_ACCESS_KEY
+      - TENABLE_SECRET_KEY
+    ports:
+      - 9095:9095
+    depends_on:
+      - mysql
+
+volumes:
+  prometheus-data:
+  grafana-storage:
