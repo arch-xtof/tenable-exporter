@@ -1,1 +1,1 @@
-# prometheus-exporter
+# tenable-exporter
